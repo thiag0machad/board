@@ -6,19 +6,14 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 export function SignInButton() {
   const { data: session } = useSession();
 
-  console.log(session);
-
   return session ? (
     <button
       type='button'
       className={styles.signInButton}
       onClick={() => signOut()}
     >
-      <img
-        src='https://sujeitoprogramador.com/steve.png'
-        alt='Foto do usuário'
-      />
-      Olá Thiago
+      <img src={session.user.image} alt='Foto do usuário' />
+      Olá {session.user.name}
       <FiX color='#737380' className={styles.closeIcon} />
     </button>
   ) : (
