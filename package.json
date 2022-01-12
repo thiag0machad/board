@@ -1,5 +1,5 @@
 {
-  "name": "board-app",
+  "name": "board",
   "private": true,
   "scripts": {
     "dev": "next dev",
