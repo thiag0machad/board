@@ -4,16 +4,57 @@ import { FiPlus, FiCalendar, FiEdit, FiTrash, FiClock } from 'react-icons/fi';
 import { SupportButton } from '../../components/SupportButton';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
+import { FormEvent, useState } from 'react';
+import firebaseApp from '../../services/firebaseConnection';
+import { addDoc, collection } from 'firebase/firestore/lite';
+import { getFirestore } from 'firebase/firestore/lite';
 
-export default function Board() {
+interface BoardProps {
+  user: {
+    id: string;
+    name: string;
+  };
+}
+
+export default function Board({ user }: BoardProps) {
+  const [input, setInput] = useState('');
+
+  async function handleAddTask(event: FormEvent) {
+    event.preventDefault();
+
+    if (input === '') {
+      alert('Preencha alguma tarefa!');
+      return;
+    }
+
+    const db = getFirestore(firebaseApp);
+
+    await addDoc(collection(db, 'tasks'), {
+      created: new Date(),
+      task: input,
+      userId: user.id,
+      name: user.name
+    })
+      .then((document) => {
+        console.log('CADASTRADO COM SUCESSO!');
+      })
+      .catch((error) => {
+        console.log('ERRO AO CADASTRAR: ', error);
+      });
+  }
+
   return (
     <>
       <Head>
         <title>Minhas Tarefas - Board</title>
       </Head>
       <main className={styles.container}>
-        <form>
-          <input type='text' placeholder='Digite sua tarefa...' />
+        <form onSubmit={handleAddTask}>
+          <input
+            type='text'
+            placeholder='Digite sua tarefa...'
+            onChange={(event) => setInput(event.target.value)}
+          />
           <button type='submit'>
             <FiPlus size={25} color='#17181f' />
           </button>
@@ -61,7 +102,7 @@ export default function Board() {
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const session = await getSession({ req });
 
-  if (!session) {
+  if (!session?.id) {
     return {
       redirect: {
         destination: '/',
@@ -70,7 +111,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     };
   }
 
+  const user = {
+    name: session?.user.name,
+    id: session?.id
+  };
+
   return {
-    props: {}
+    props: { user }
   };
 };
