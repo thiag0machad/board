@@ -1,5 +1,12 @@
 import Head from 'next/head';
-import { FiPlus, FiCalendar, FiEdit, FiTrash, FiClock } from 'react-icons/fi';
+import {
+  FiPlus,
+  FiCalendar,
+  FiEdit,
+  FiTrash,
+  FiClock,
+  FiX,
+} from 'react-icons/fi';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import { FormEvent, useState } from 'react';
@@ -12,6 +19,7 @@ import {
   getFirestore,
   deleteDoc,
   doc,
+  updateDoc,
 } from 'firebase/firestore/lite';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -40,6 +48,8 @@ export default function Board({ user, data }: BoardProps) {
   const [input, setInput] = useState('');
   const [taskList, setTaskList] = useState<TaskList[]>(JSON.parse(data));
 
+  const [taskEdit, setTaskEdit] = useState<TaskList | null>(null);
+
   const db = getFirestore(firebaseApp);
 
   async function handleAddTask(event: FormEvent) {
@@ -47,6 +57,28 @@ export default function Board({ user, data }: BoardProps) {
 
     if (input === '') {
       alert('Preencha alguma tarefa!');
+      return;
+    }
+
+    if (taskEdit) {
+      await updateDoc(doc(db, 'tasks', taskEdit.id), {
+        task: input,
+      })
+        .then(() => {
+          const data = taskList;
+          const taskIndex = taskList.findIndex(
+            (item) => item.id === taskEdit.id
+          );
+          data[taskIndex].task = input;
+
+          setTaskList(data);
+          setTaskEdit(null);
+          setInput('');
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
       return;
     }
 
@@ -77,7 +109,7 @@ export default function Board({ user, data }: BoardProps) {
 
   async function handleDelete(taskId: string) {
     await deleteDoc(doc(db, 'tasks', taskId))
-      .then((document) => {
+      .then(() => {
         console.log('DELETADO COM SUCESSO!');
 
         const newTaskList = taskList.filter((item) => {
@@ -90,12 +122,31 @@ export default function Board({ user, data }: BoardProps) {
       });
   }
 
+  async function handleEditTask(task: TaskList) {
+    setTaskEdit(task);
+    setInput(task.task);
+  }
+
+  async function handleCancelEdit() {
+    setTaskEdit(null);
+    setInput('');
+  }
+
   return (
     <>
       <Head>
         <title>Minhas Tarefas - Board</title>
       </Head>
       <main className={styles.container}>
+        {taskEdit && (
+          <span className={styles.warnText}>
+            <button onClick={handleCancelEdit}>
+              <FiX size={30} color='#ff3636' />
+            </button>
+            Você está editando uma tarefa!
+          </span>
+        )}
+
         <form onSubmit={handleAddTask}>
           <input
             type='text'
@@ -125,7 +176,7 @@ export default function Board({ user, data }: BoardProps) {
                     <FiCalendar size={20} color='#ffb800' />
                     <time>{task.createdFormatted}</time>
                   </div>
-                  <button>
+                  <button onClick={() => handleEditTask(task)}>
                     <FiEdit size={20} color='#fff' />
                     <span>Editar</span>
                   </button>
@@ -170,8 +221,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   const tasksRef = collection(db, 'tasks');
 
-  const q = query(tasksRef, where('userId', '==', session.id));
-  const querySnapshot = await getDocs(q);
+  const querySnapshot = await getDocs(
+    query(tasksRef, where('userId', '==', session.id))
+  );
 
   const data = JSON.stringify(
     querySnapshot.docs.map((doc) => ({
