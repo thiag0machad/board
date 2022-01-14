@@ -1,6 +1,7 @@
 import styles from './styles.module.scss';
 import Link from 'next/link';
 import { SignInButton } from '../SignInButton';
+import React from 'react';
 
 export function Header() {
   return (

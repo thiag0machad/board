@@ -1,4 +1,4 @@
-import NextAuth, { Account, Profile, User } from 'next-auth';
+import NextAuth from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
 
 export default NextAuth({
@@ -8,10 +8,10 @@ export default NextAuth({
       clientSecret: process.env.GITHUB_SECRET,
       authorization: {
         params: {
-          scope: 'read:user'
-        }
-      }
-    })
+          scope: 'read:user',
+        },
+      },
+    }),
   ],
   callbacks: {
     async session({ session, token }) {
@@ -21,7 +21,7 @@ export default NextAuth({
         return { ...session, id: null };
       }
     },
-    async signIn({ user, account, profile }) {
+    async signIn({ user }) {
       const { email } = user;
       try {
         return true;
@@ -29,6 +29,6 @@ export default NextAuth({
         console.log('DEU ERRO:', error);
         return false;
       }
-    }
-  }
+    },
+  },
 });
