@@ -26,7 +26,6 @@ import Link from 'next/link';
 import styles from './styles.module.scss';
 import firebaseApp from '../../services/firebaseConnection';
 import { SupportButton } from '../../components/SupportButton';
-import React from 'react';
 
 type TaskList = {
   id: string;
@@ -219,10 +218,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   const db = getFirestore(firebaseApp);
 
-  const tasksRef = collection(db, 'tasks');
-
   const querySnapshot = await getDocs(
-    query(tasksRef, where('userId', '==', session.id))
+    query(collection(db, 'tasks'), where('userId', '==', session.id))
   );
 
   const data = JSON.stringify(
@@ -232,8 +229,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       ...doc.data(),
     }))
   );
-
-  console.log(data);
 
   const user = {
     name: session?.user.name,
