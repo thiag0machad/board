@@ -10,6 +10,8 @@ import {
   query,
   where,
   getFirestore,
+  deleteDoc,
+  doc,
 } from 'firebase/firestore/lite';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -38,6 +40,8 @@ export default function Board({ user, data }: BoardProps) {
   const [input, setInput] = useState('');
   const [taskList, setTaskList] = useState<TaskList[]>(JSON.parse(data));
 
+  const db = getFirestore(firebaseApp);
+
   async function handleAddTask(event: FormEvent) {
     event.preventDefault();
 
@@ -45,8 +49,6 @@ export default function Board({ user, data }: BoardProps) {
       alert('Preencha alguma tarefa!');
       return;
     }
-
-    const db = getFirestore(firebaseApp);
 
     await addDoc(collection(db, 'tasks'), {
       created: new Date(),
@@ -70,6 +72,21 @@ export default function Board({ user, data }: BoardProps) {
       })
       .catch((error) => {
         console.log('ERRO AO CADASTRAR: ', error);
+      });
+  }
+
+  async function handleDelete(taskId: string) {
+    await deleteDoc(doc(db, 'tasks', taskId))
+      .then((document) => {
+        console.log('DELETADO COM SUCESSO!');
+
+        const newTaskList = taskList.filter((item) => {
+          return item.id !== taskId;
+        });
+        setTaskList(newTaskList);
+      })
+      .catch((error) => {
+        console.log('ERRO AO DELETAR: ', error);
       });
   }
 
@@ -114,7 +131,7 @@ export default function Board({ user, data }: BoardProps) {
                   </button>
                 </div>
 
-                <button>
+                <button onClick={() => handleDelete(task.id)}>
                   <FiTrash size={20} color='#ff3636' />
                   <span>Excluir</span>
                 </button>
