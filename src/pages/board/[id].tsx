@@ -1,9 +1,8 @@
-import { collection, getDocs, query, where } from 'firebase/firestore/lite';
+import { doc, getDoc } from 'firebase/firestore/lite';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import { format } from 'date-fns';
 import { db } from '../../services/firebaseConnection';
-import { documentId } from 'firebase/firestore/lite';
 import Head from 'next/head';
 import { FiCalendar } from 'react-icons/fi';
 import styles from './task.module.scss';
@@ -34,10 +33,10 @@ export default function Task({ data }: TaskListProps) {
           <div>
             <FiCalendar size={30} color='#fff' />
             <span>Tarefa criada:</span>
-            <time>{task[0].createdFormatted}</time>
+            <time>{task.createdFormatted}</time>
           </div>
         </div>
-        <p>{task[0].task}</p>
+        <p>{task.task}</p>
       </article>
     </>
   );
@@ -58,24 +57,35 @@ export const getServerSideProps: GetServerSideProps = async ({
       },
     };
   }
+  const docRef = doc(db, 'tasks', String(id));
+  const data = await getDoc(docRef)
+    .then((snapshot) => {
+      const data = {
+        id: snapshot.id,
+        created: snapshot.data().created,
+        createdFormatted: format(
+          snapshot.data().created.toDate(),
+          'dd MMMM yyyy'
+        ),
+        task: snapshot.data().task,
+        userId: snapshot.data().userId,
+        nome: snapshot.data().name,
+      };
 
-  const querySnapshot = await getDocs(
-    query(collection(db, 'tasks'), where(documentId(), '==', id))
-  );
+      return JSON.stringify(data);
+    })
+    .catch(() => {
+      return {};
+    });
 
-  const data = JSON.stringify(
-    querySnapshot.docs.map((snapshot) => ({
-      id: snapshot.id,
-      created: snapshot.data().created,
-      createdFormatted: format(
-        snapshot.data().created.toDate(),
-        'dd MMMM yyyy'
-      ),
-      task: snapshot.data().task,
-      userId: snapshot.data().userId,
-      nome: snapshot.data().name,
-    }))
-  );
+  if (Object.keys(data).length === 0) {
+    return {
+      redirect: {
+        destination: '/board',
+        permanent: false,
+      },
+    };
+  }
 
   return {
     props: { data },
