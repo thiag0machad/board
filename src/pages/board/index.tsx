@@ -23,7 +23,7 @@ import {
 import { format } from 'date-fns';
 import Link from 'next/link';
 import styles from './styles.module.scss';
-import db from '../../services/firestoreConnection';
+import { db } from '../../services/firebaseConnection';
 import { SupportButton } from '../../components/SupportButton';
 
 // CLIENT ID AZvUic-sD4XxWBhpl3EMshstRlk1kJ8eJeS8MHcxrgjOa6oS4KV1tyATanY70zkNKmaJ1OSmBixXdinK

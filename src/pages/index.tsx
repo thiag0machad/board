@@ -1,9 +1,23 @@
 import styles from '../styles/styles.module.scss';
 import Head from 'next/head';
 import { GetStaticProps } from 'next';
-import React from 'react';
+import { collection, getDocs, query, where } from 'firebase/firestore/lite';
+import { db } from '../services/firebaseConnection';
+import { useState } from 'react';
 
-export default function Home() {
+type Data = {
+  id: string;
+  donate: boolean;
+  lastDonate: Date;
+  image: string;
+};
+interface HomeProps {
+  data: string;
+}
+
+export default function Home({ data }: HomeProps) {
+  const [donaters, setDonaters] = useState<Data[]>(JSON.parse(data));
+
   return (
     <>
       <Head>
@@ -21,8 +35,11 @@ export default function Home() {
           </p>
         </section>
 
+        {donaters.length !== 0 && <h3>Apoiadores:</h3>}
         <div className={styles.donaters}>
-          <img src='https://sujeitoprogramador.com/steve.png' alt='Usuário 1' />
+          {donaters.map((donater) => (
+            <img key={donater.image} src={donater.image} alt={donater.id} />
+          ))}
         </div>
       </main>
     </>
@@ -30,8 +47,19 @@ export default function Home() {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
+  const querySnapshot = await getDocs(
+    query(collection(db, 'users'), where('donate', '==', true))
+  );
+
+  const data = JSON.stringify(
+    querySnapshot.docs.map((snapshot) => ({
+      id: snapshot.id,
+      ...snapshot.data(),
+    }))
+  );
+
   return {
-    props: {},
+    props: { data },
     revalidate: 60 * 60,
   };
 };

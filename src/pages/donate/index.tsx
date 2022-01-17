@@ -4,7 +4,7 @@ import Head from 'next/head';
 import styles from './styles.module.scss';
 import { PayPalButtons } from '@paypal/react-paypal-js';
 import { doc, setDoc } from 'firebase/firestore/lite';
-import db from '../../services/firestoreConnection';
+import { db } from '../../services/firebaseConnection';
 import { useState } from 'react';
 
 interface DonateProps {
@@ -19,13 +19,9 @@ export default function Donate({ user }: DonateProps) {
       donate: true,
       lastDonate: new Date(),
       image: user.image,
-    })
-      .then(() => {
-        setVip(true);
-      })
-      .catch((error) => {
-        console.log('ERRO AO CADASTRAR: ', error);
-      });
+    }).then(() => {
+      setVip(true);
+    });
   }
 
   return (
