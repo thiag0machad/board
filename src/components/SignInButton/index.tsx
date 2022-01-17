@@ -1,8 +1,8 @@
-import styles from './styles.module.scss';
+import { signIn, signOut, useSession } from 'next-auth/react';
+import Image from 'next/image';
 import { FaGithub } from 'react-icons/fa';
 import { FiX } from 'react-icons/fi';
-import { signIn, signOut, useSession } from 'next-auth/react';
-import React from 'react';
+import styles from './styles.module.scss';
 
 export function SignInButton() {
   const { data: session } = useSession();
@@ -13,7 +13,14 @@ export function SignInButton() {
       className={styles.signInButton}
       onClick={() => signOut()}
     >
-      <img src={session.user.image} alt='Foto do usuário' />
+      <div>
+        <Image
+          src={session.user.image}
+          alt='Foto do usuário'
+          width={35}
+          height={35}
+        />
+      </div>
       Olá {session.user.name}
       <FiX color='#737380' className={styles.closeIcon} />
     </button>

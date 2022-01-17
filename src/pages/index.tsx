@@ -1,9 +1,10 @@
-import styles from '../styles/styles.module.scss';
-import Head from 'next/head';
+import { collection, getDocs } from 'firebase/firestore/lite';
 import { GetStaticProps } from 'next';
-import { collection, getDocs, query, where } from 'firebase/firestore/lite';
-import { db } from '../services/firebaseConnection';
+import Head from 'next/head';
+import Image from 'next/image';
 import { useState } from 'react';
+import { db } from '../services/firebaseConnection';
+import styles from '../styles/styles.module.scss';
 
 type Data = {
   id: string;
@@ -24,7 +25,12 @@ export default function Home({ data }: HomeProps) {
         <title>Board - Organizando suas tarefas.</title>
       </Head>
       <main className={styles.contentContainer}>
-        <img src='/images/board-user.svg' alt='Ferramenta board' />
+        <Image
+          src='/images/board-user.svg'
+          alt='Ferramenta board'
+          width={450}
+          height={450}
+        />
 
         <section className={styles.callToAction}>
           <h1>
@@ -38,7 +44,14 @@ export default function Home({ data }: HomeProps) {
         {donaters.length !== 0 && <h3>Apoiadores:</h3>}
         <div className={styles.donaters}>
           {donaters.map((donater) => (
-            <img key={donater.image} src={donater.image} alt={donater.id} />
+            <div key={donater.image}>
+              <Image
+                src={donater.image}
+                alt={donater.id}
+                width={65}
+                height={65}
+              />
+            </div>
           ))}
         </div>
       </main>

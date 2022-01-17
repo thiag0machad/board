@@ -1,11 +1,12 @@
+import { PayPalButtons } from '@paypal/react-paypal-js';
+import { doc, setDoc } from 'firebase/firestore/lite';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import Head from 'next/head';
-import styles from './styles.module.scss';
-import { PayPalButtons } from '@paypal/react-paypal-js';
-import { doc, setDoc } from 'firebase/firestore/lite';
-import { db } from '../../services/firebaseConnection';
+import Image from 'next/image';
 import { useState } from 'react';
+import { db } from '../../services/firebaseConnection';
+import styles from './styles.module.scss';
 
 interface DonateProps {
   user: { name: string; id: string; image: string };
@@ -32,11 +33,18 @@ export default function Donate({ user }: DonateProps) {
       </Head>
 
       <main className={styles.container}>
-        <img src='/images/rocket.svg' alt='Foto de perfil do usuário' />
+        <Image
+          src='/images/rocket.svg'
+          alt='Foto de perfil do usuário'
+          width={350}
+          height={350}
+        />
 
         {vip && (
           <div className={styles.vip}>
-            <img src={user.image} alt='' />
+            <div>
+              <Image src={user.image} alt='' width={50} height={50} />
+            </div>
             <span>Parabéns você é um novo apoiador!</span>
           </div>
         )}

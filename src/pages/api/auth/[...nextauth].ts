@@ -1,11 +1,4 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-} from 'firebase/firestore/lite';
+import { doc, getDoc } from 'firebase/firestore/lite';
 import NextAuth from 'next-auth';
 import GithubProvider from 'next-auth/providers/github';
 import { db } from '../../../services/firebaseConnection';

@@ -1,8 +1,8 @@
-import { AppProps } from 'next/app';
-import '../styles/global.scss';
-import { Header } from '../components/Header';
-import { SessionProvider } from 'next-auth/react';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
+import { SessionProvider } from 'next-auth/react';
+import { AppProps } from 'next/app';
+import { Header } from '../components/Header';
+import '../styles/global.scss';
 
 const initialOptions = {
   'client-id':

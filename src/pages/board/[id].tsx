@@ -1,10 +1,10 @@
+import { format } from 'date-fns';
 import { doc, getDoc } from 'firebase/firestore/lite';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
-import { format } from 'date-fns';
-import { db } from '../../services/firebaseConnection';
 import Head from 'next/head';
 import { FiCalendar } from 'react-icons/fi';
+import { db } from '../../services/firebaseConnection';
 import styles from './task.module.scss';
 
 type Task = {

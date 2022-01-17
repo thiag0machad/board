@@ -1,14 +1,19 @@
-import styles from './styles.module.scss';
+import Image from 'next/image';
 import Link from 'next/link';
 import { SignInButton } from '../SignInButton';
-import React from 'react';
+import styles from './styles.module.scss';
 
 export function Header() {
   return (
     <header className={styles.headerContainer}>
       <div className={styles.headerContent}>
         <Link href='/'>
-          <img src='/images/logo.svg' alt='Logo meu board' />
+          <Image
+            src='/images/logo.svg'
+            alt='Logo meu board'
+            width={50}
+            height={50}
+          />
         </Link>
         <nav>
           <Link href='/'>

@@ -1,34 +1,31 @@
-import Head from 'next/head';
-import {
-  FiPlus,
-  FiCalendar,
-  FiEdit,
-  FiTrash,
-  FiClock,
-  FiX,
-} from 'react-icons/fi';
-import { GetServerSideProps } from 'next';
-import { getSession } from 'next-auth/react';
-import { FormEvent, useState } from 'react';
+import { format, formatDistance } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import {
   addDoc,
   collection,
-  getDocs,
-  query,
-  where,
   deleteDoc,
   doc,
+  getDocs,
+  query,
   updateDoc,
+  where,
 } from 'firebase/firestore/lite';
-import { format, formatDistance } from 'date-fns';
+import { GetServerSideProps } from 'next';
+import { getSession } from 'next-auth/react';
+import Head from 'next/head';
 import Link from 'next/link';
-import styles from './styles.module.scss';
-import { db } from '../../services/firebaseConnection';
+import { FormEvent, useState } from 'react';
+import {
+  FiCalendar,
+  FiClock,
+  FiEdit,
+  FiPlus,
+  FiTrash,
+  FiX,
+} from 'react-icons/fi';
 import { SupportButton } from '../../components/SupportButton';
-import { ptBR } from 'date-fns/locale';
-
-// CLIENT ID AZvUic-sD4XxWBhpl3EMshstRlk1kJ8eJeS8MHcxrgjOa6oS4KV1tyATanY70zkNKmaJ1OSmBixXdinK
-// <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID"></script>
+import { db } from '../../services/firebaseConnection';
+import styles from './styles.module.scss';
 
 type TaskList = {
   id: string;

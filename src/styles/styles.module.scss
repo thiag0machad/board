@@ -9,12 +9,8 @@
   justify-content: center;
   flex-direction: column;
 
-  img {
-    margin-top: 2rem;
-  }
-
   h3 {
-    margin-top: 2rem;
+    margin: 2rem 0;
   }
 }
 
@@ -53,14 +49,16 @@
     height: 65px;
     border-radius: 50%;
     border: 2px solid #141a29;
-    transition: all 0.2s;
+  }
 
-    + img {
+  div {
+    transition: all 0.2s;
+    + div {
       margin-left: 1rem;
     }
   }
 
-  img:hover {
+  div:hover {
     transform: scale(1.2);
   }
 }
