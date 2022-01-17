@@ -16,7 +16,6 @@ import {
   getDocs,
   query,
   where,
-  getFirestore,
   deleteDoc,
   doc,
   updateDoc,
@@ -24,8 +23,11 @@ import {
 import { format } from 'date-fns';
 import Link from 'next/link';
 import styles from './styles.module.scss';
-import firebaseApp from '../../services/firebaseConnection';
+import db from '../../services/firestoreConnection';
 import { SupportButton } from '../../components/SupportButton';
+
+// CLIENT ID AZvUic-sD4XxWBhpl3EMshstRlk1kJ8eJeS8MHcxrgjOa6oS4KV1tyATanY70zkNKmaJ1OSmBixXdinK
+// <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID"></script>
 
 type TaskList = {
   id: string;
@@ -48,8 +50,6 @@ export default function Board({ user, data }: BoardProps) {
   const [taskList, setTaskList] = useState<TaskList[]>(JSON.parse(data));
 
   const [taskEdit, setTaskEdit] = useState<TaskList | null>(null);
-
-  const db = getFirestore(firebaseApp);
 
   async function handleAddTask(event: FormEvent) {
     event.preventDefault();
@@ -215,8 +215,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
-
-  const db = getFirestore(firebaseApp);
 
   const querySnapshot = await getDocs(
     query(collection(db, 'tasks'), where('userId', '==', session.id))

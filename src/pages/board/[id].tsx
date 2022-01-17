@@ -8,7 +8,7 @@ import {
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import { format } from 'date-fns';
-import firebaseApp from '../../services/firebaseConnection';
+import db from '../../services/firestoreConnection';
 import { documentId } from 'firebase/firestore/lite';
 import Head from 'next/head';
 import { FiCalendar } from 'react-icons/fi';
@@ -64,8 +64,6 @@ export const getServerSideProps: GetServerSideProps = async ({
       },
     };
   }
-
-  const db = getFirestore(firebaseApp);
 
   const querySnapshot = await getDocs(
     query(collection(db, 'tasks'), where(documentId(), '==', id))
