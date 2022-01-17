@@ -1,10 +1,4 @@
-import {
-  collection,
-  getDocs,
-  getFirestore,
-  query,
-  where,
-} from 'firebase/firestore/lite';
+import { collection, getDocs, query, where } from 'firebase/firestore/lite';
 import { GetServerSideProps } from 'next';
 import { getSession } from 'next-auth/react';
 import { format } from 'date-fns';
@@ -56,7 +50,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const { id } = params;
   const session = await getSession({ req });
 
-  if (!session?.id) {
+  if (!session?.vip) {
     return {
       redirect: {
         destination: '/board',
@@ -82,8 +76,6 @@ export const getServerSideProps: GetServerSideProps = async ({
       nome: snapshot.data().name,
     }))
   );
-
-  console.log(data);
 
   return {
     props: { data },

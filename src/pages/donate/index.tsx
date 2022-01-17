@@ -60,10 +60,7 @@ export default function Donate({ user }: DonateProps) {
             });
           }}
           onApprove={(data, actions) => {
-            return actions.order.capture().then((details) => {
-              console.log('Compra aprovada: ' + details.payer.name.given_name);
-              handleSaveDonate();
-            });
+            return actions.order.capture().then(() => handleSaveDonate());
           }}
         />
       </main>

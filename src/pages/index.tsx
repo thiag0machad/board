@@ -47,9 +47,7 @@ export default function Home({ data }: HomeProps) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-  const querySnapshot = await getDocs(
-    query(collection(db, 'users'), where('donate', '==', true))
-  );
+  const querySnapshot = await getDocs(collection(db, 'users'));
 
   const data = JSON.stringify(
     querySnapshot.docs.map((snapshot) => ({

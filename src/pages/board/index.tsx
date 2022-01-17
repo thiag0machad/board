@@ -20,11 +20,12 @@ import {
   doc,
   updateDoc,
 } from 'firebase/firestore/lite';
-import { format } from 'date-fns';
+import { format, formatDistance } from 'date-fns';
 import Link from 'next/link';
 import styles from './styles.module.scss';
 import { db } from '../../services/firebaseConnection';
 import { SupportButton } from '../../components/SupportButton';
+import { ptBR } from 'date-fns/locale';
 
 // CLIENT ID AZvUic-sD4XxWBhpl3EMshstRlk1kJ8eJeS8MHcxrgjOa6oS4KV1tyATanY70zkNKmaJ1OSmBixXdinK
 // <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID"></script>
@@ -41,6 +42,8 @@ interface BoardProps {
   user: {
     id: string;
     name: string;
+    vip: boolean;
+    lastDonate: string | Date;
   };
   data: string;
 }
@@ -88,8 +91,6 @@ export default function Board({ user, data }: BoardProps) {
       name: user.name,
     })
       .then((document) => {
-        console.log('CADASTRADO COM SUCESSO!');
-
         const data = {
           id: document.id,
           created: new Date(),
@@ -109,8 +110,6 @@ export default function Board({ user, data }: BoardProps) {
   async function handleDelete(taskId: string) {
     await deleteDoc(doc(db, 'tasks', taskId))
       .then(() => {
-        console.log('DELETADO COM SUCESSO!');
-
         const newTaskList = taskList.filter((item) => {
           return item.id !== taskId;
         });
@@ -175,10 +174,12 @@ export default function Board({ user, data }: BoardProps) {
                     <FiCalendar size={20} color='#ffb800' />
                     <time>{task.createdFormatted}</time>
                   </div>
-                  <button onClick={() => handleEditTask(task)}>
-                    <FiEdit size={20} color='#fff' />
-                    <span>Editar</span>
-                  </button>
+                  {user.vip && (
+                    <button onClick={() => handleEditTask(task)}>
+                      <FiEdit size={20} color='#fff' />
+                      <span>Editar</span>
+                    </button>
+                  )}
                 </div>
 
                 <button onClick={() => handleDelete(task.id)}>
@@ -191,13 +192,20 @@ export default function Board({ user, data }: BoardProps) {
         </section>
       </main>
 
-      <div className={styles.vipContainer}>
-        <h3>Obrigado por apoiar esse projeto.</h3>
-        <div>
-          <FiClock size={28} color='#fff' />
-          <time>Última doação foi a 3 dias.</time>
+      {user.vip && (
+        <div className={styles.vipContainer}>
+          <h3>Obrigado por apoiar esse projeto.</h3>
+          <div>
+            <FiClock size={28} color='#fff' />
+            <time>
+              Última doação foi a{' '}
+              {formatDistance(new Date(user.lastDonate), new Date(), {
+                locale: ptBR,
+              })}
+            </time>
+          </div>
         </div>
-      </div>
+      )}
 
       <SupportButton />
     </>
@@ -231,6 +239,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const user = {
     name: session?.user.name,
     id: session?.id,
+    vip: session?.vip,
+    lastDonate: session?.lastDonate,
   };
 
   return {
